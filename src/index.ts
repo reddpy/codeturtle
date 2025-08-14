@@ -16,8 +16,79 @@ const github_app = new GitHubApp({
   webhooks: { secret: webhook_secret },
 });
 
-const messageForNewPRs =
-  "Thanks for opening a new PR! Please follow our contributing guidelines to make your PR easier to review.";
+async function reviewCodeWithOllama(files, commit_msg) {
+  const prompt = `You are a code reviewer.
+  Please review the following code changes and provide feedback on:
+- Code quality and best practices
+- Potential bugs or issues
+- Security concerns
+- Performance improvements
+- Style and readability
+
+Here is the commit message: ${commit_msg}
+
+Here are the file changes:
+
+${files
+  .map(
+    (file) => `
+## File: ${file.filename} (${file.status})
+Changes: +${file.additions} -${file.deletions}
+
+${file.patch || "No diff available"}
+`,
+  )
+  .join("\n")}
+
+Please provide a very concise review with specific suggestions for improvement for only the files affected.
+Mention only things in the code and commits worth improving, if anything at all.
+If there are no issues, just say "Good to Ship 🚀".
+`;
+
+  try {
+    console.log("🔄 Calling Ollama API...");
+    const response = await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "codellama:7b",
+        prompt: prompt,
+        stream: false,
+      }),
+    });
+
+    console.log("📡 Ollama response status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Ollama error response:", errorText);
+      throw new Error(
+        `Ollama request failed: ${response.status} - ${errorText}`,
+      );
+    }
+
+    const data = await response.json();
+    console.log("✅ Ollama response received");
+
+    // Make sure we return a string
+    const reviewText = data.response || "No review generated";
+    if (typeof reviewText !== "string") {
+      console.error(
+        "Ollama returned non-string response:",
+        typeof reviewText,
+        reviewText,
+      );
+      return "AI review failed - invalid response format";
+    }
+
+    return reviewText;
+  } catch (error) {
+    console.error("❌ Error calling Ollama:", error);
+    return "Sorry, I could not review the code at this time. Please check that Ollama is running with: `ollama serve`";
+  }
+}
 
 async function handlePR_Opened({ octokit, payload }) {
   console.log(
@@ -27,6 +98,8 @@ async function handlePR_Opened({ octokit, payload }) {
   const owner = payload.repository.owner.login;
   const repo = payload.repository.name;
   const pull_number = payload.pull_request.number;
+
+  let LLM_response;
 
   try {
     const { data: files } = await octokit.request(
@@ -53,6 +126,9 @@ async function handlePR_Opened({ octokit, payload }) {
     });
 
     console.log("finished printing files");
+    const commit_message = payload.pull_request.body;
+
+    LLM_response = await reviewCodeWithOllama(files, commit_message);
   } catch (error) {
     if (error.response) {
       console.log("getting PR details");
@@ -63,7 +139,6 @@ async function handlePR_Opened({ octokit, payload }) {
     console.error(error);
   }
 
-  console.log(payload.pull_request.body);
   try {
     await octokit.request(
       "POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
@@ -71,7 +146,7 @@ async function handlePR_Opened({ octokit, payload }) {
         owner: payload.repository.owner.login,
         repo: payload.repository.name,
         issue_number: payload.pull_request.number,
-        body: messageForNewPRs,
+        body: LLM_response,
         headers: {
           "x-github-api-version": "2022-11-28",
         },
