@@ -72,6 +72,7 @@ app.get("/", (c) => {
 });
 
 app.use(gh_middleware);
+console.log("hi");
 
 export default {
   port: port,
