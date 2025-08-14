@@ -16,3 +16,6 @@ build/
 
 # OS-specific files
 .DS_Store
+
+#Github secret file
+secrets/
