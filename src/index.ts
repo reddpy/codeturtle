@@ -41,7 +41,7 @@ ${file.patch || "No diff available"}
   .join("\n")}
 
 Please provide a very concise review with specific suggestions for improvement for only the files affected.
-Mention only things in the review worth improving.
+Mention only things in the code and commits worth improving, if anything at all.
 If there are no issues, just say "Good to Ship 🚀".
 `;
 
