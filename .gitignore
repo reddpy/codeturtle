@@ -1,2 +1,18 @@
-# deps
+# Dependencies
 node_modules/
+
+# Bun Lockfile (usually committed, but can be ignored if desired)
+# bun.lockb
+
+# Logs
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
