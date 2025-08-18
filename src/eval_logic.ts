@@ -26,41 +26,6 @@ async function reviewCodeWithOllama(
   Changes: +${file.additions} -${file.deletions}
 
   ${file.patch || "No diff available"}
-
-  <details>
-  <summary>Code Quality & Best Practices</summary>
-
-  <!-- AI writes suggestions here -->
-
-  </details>
-
-  <details>
-  <summary>Potential Bugs or Issues</summary>
-
-  <!-- AI writes suggestions here -->
-
-  </details>
-
-  <details>
-  <summary>Security Concerns</summary>
-
-  <!-- AI writes suggestions here -->
-
-  </details>
-
-  <details>
-  <summary>Performance Improvements</summary>
-
-  <!-- AI writes suggestions here -->
-
-  </details>
-
-  <details>
-  <summary>Style & Readability</summary>
-
-  <!-- AI writes suggestions here -->
-
-  </details>
   `,
     )
     .join("\n")}
