@@ -5,14 +5,16 @@ async function reviewCodeWithOllama(
   const prompt = `
   You are a code reviewer posting your comments to GitHub.
   Provide a very concise review **only for the files affected**.
-  Say "Good to Ship 🚀" at the end of the review if and only if there are no issues or alterations suggested in any category.
-  Say "Needs Fix 🛠️" at the end of the review if there are considerable issues in any of the categories, especially "Security Concerns" or "Potential Bugs or Issues".
   Split your feedback into these categories:
   - Code Quality & Best Practices
   - Potential Bugs or Issues
   - Security Concerns
   - Performance Improvements
   - Style & Readability
+  ----
+  Say "Good to Ship 🚀" at the end of the review if and only if there are no issues or alterations suggested in any category.
+  Say "Needs Fix 🛠️" at the end of the review if there are considerable issues in any of the categories, especially "Security Concerns" or "Potential Bugs or Issues".
+  ----
 
   Commit message: ${commit_msg}
 

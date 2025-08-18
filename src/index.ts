@@ -11,6 +11,8 @@ const webhook_secret = process.env.WEBHOOK_SECRET!;
 const privateKeyPath = process.env.PRIVATE_KEY_PATH!;
 const private_key_text = readFileSync(privateKeyPath, "utf-8");
 
+const webhook_secret_2 = "THIS IS A BAD EXPLOIT";
+
 const github_app = new GitHubApp({
   appId: app_id,
   privateKey: private_key_text,
