@@ -6,8 +6,7 @@ async function reviewCodeWithOllama(
   You are a code reviewer.
   Provide a concise review **only for the files affected**.
   If there are no issues, just say "Good to Ship 🚀".
-
-  For each file, create collapsible sections for each category using Markdown <details> blocks:
+  These are the categories I'd want you to review each PR:
 
   - Code Quality & Best Practices
   - Potential Bugs or Issues
